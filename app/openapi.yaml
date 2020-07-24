@@ -1,0 +1,185 @@
+openapi: 3.0.0
+info:
+  title: Trantor Demo API
+  description: Event driven design Trantor.
+  version: 0.0.0
+
+servers:
+  - url: http://localhost:5000/
+    description: Local development server
+
+paths:
+  /deployments:
+    get:
+      operationId: app.views.get_deployments
+      responses:
+        200:
+          description: Return Deployments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+    post:
+      operationId: app.views.create_deployment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Deployment"
+      responses:
+        200:
+          description: Create deployment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+  /deployments/{deployment_id}:
+    get:
+      operationId: app.views.get_deployment
+      parameters:
+        - name: deployment_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Deployment UUID
+      responses:
+        200:
+          description: Returns the specified Deployment by UUID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+    delete:
+      operationId: app.views.delete_deployment
+      parameters:
+        - name: deployment_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Deployment UUID
+      responses:
+        200:
+          description: Deletes specified Deployment by UUID
+  /events:
+    post:
+      summary: Event handler
+      operationId: app.views.handle_event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/DeploymentCreatedEvent'
+                - $ref: '#/components/schemas/DeploymentFailedEvent'
+                - $ref: '#/components/schemas/DeploymentSuccessEvent'
+                - $ref: '#/components/schemas/PackagingFailedEvent'
+                - $ref: '#/components/schemas/PackagingSuccessEvent'
+              discriminator:
+                propertyName: event_type
+      responses:
+        '200':
+          description: Event received
+
+components:
+  schemas:
+    Deployment:
+      type: object
+      required:
+        - id
+        - commit_sha
+        - created_at
+        - environment
+        - initiated_by
+      properties:
+        id:
+          type: string
+        commit_sha:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          example: 2016-05-12T12:59:23Z
+          readOnly: true
+        environment:
+          type: string
+        initiated_by:
+          type: string
+
+    BaseEvent:
+      type: object
+      required:
+        - id
+        - event_type
+        - created_at
+      properties:
+        id:
+          type: string
+        event_type:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          example: 2016-05-12T12:59:23Z
+          readOnly: true
+      discriminator:
+        propertyName: event_type
+
+    DeploymentCreatedEvent:
+      allOf:
+        - $ref: "#/components/schemas/BaseEvent"
+        - type: object
+          required:
+            - deployment_id
+          properties:
+            deployment_id:
+              type: string
+
+    DeploymentFailedEvent:
+      allOf:
+        - $ref: "#/components/schemas/BaseEvent"
+        - type: object
+          required:
+            - deployment_id
+            - reason
+          properties:
+            deployment_id:
+              type: string
+            reason:
+              type: string
+
+    DeploymentSuccessEvent:
+      allOf:
+        - $ref: "#/components/schemas/BaseEvent"
+        - type: object
+          required:
+            - deployment_id
+          properties:
+            deployment_id:
+              type: string
+
+    PackagingFailedEvent:
+      allOf:
+        - $ref: "#/components/schemas/BaseEvent"
+        - type: object
+          required:
+            - deployment_id
+            - reason
+          properties:
+            deployment_id:
+              type: string
+            reason:
+              type: string
+
+    PackagingSuccessEvent:
+      allOf:
+        - $ref: "#/components/schemas/BaseEvent"
+        - type: object
+          required:
+            - deployment_id
+          properties:
+            deployment_id:
+              type: string
