@@ -20,5 +20,5 @@ def put_event(event):
         ]
     )
 
-    if response["FailedEntryCount"] > 0:
+    if response["FailedEntryCount"]:
         raise EventDeliveryError(response["FailedEntryCount"], settings.TRANTOR_EVENT_BUS)

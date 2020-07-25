@@ -109,7 +109,7 @@ components:
         initiated_by:
           type: string
 
-    BaseEvent:
+    Event:
       type: object
       required:
         - id
@@ -130,7 +130,7 @@ components:
 
     DeploymentCreatedEvent:
       allOf:
-        - $ref: "#/components/schemas/BaseEvent"
+        - $ref: "#/components/schemas/Event"
         - type: object
           required:
             - deployment_id
@@ -140,7 +140,7 @@ components:
 
     DeploymentFailedEvent:
       allOf:
-        - $ref: "#/components/schemas/BaseEvent"
+        - $ref: "#/components/schemas/Event"
         - type: object
           required:
             - deployment_id
@@ -153,7 +153,7 @@ components:
 
     DeploymentSuccessEvent:
       allOf:
-        - $ref: "#/components/schemas/BaseEvent"
+        - $ref: "#/components/schemas/Event"
         - type: object
           required:
             - deployment_id
@@ -163,7 +163,7 @@ components:
 
     PackagingFailedEvent:
       allOf:
-        - $ref: "#/components/schemas/BaseEvent"
+        - $ref: "#/components/schemas/Event"
         - type: object
           required:
             - deployment_id
@@ -176,7 +176,7 @@ components:
 
     PackagingSuccessEvent:
       allOf:
-        - $ref: "#/components/schemas/BaseEvent"
+        - $ref: "#/components/schemas/Event"
         - type: object
           required:
             - deployment_id

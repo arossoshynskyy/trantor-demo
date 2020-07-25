@@ -24,9 +24,9 @@ def handle_deployment_created(body):
         deployment = get_db().get(body["deployment_id"])
         package(deployment)
         
-        put_event(DeploymentSuccessEvent(body["deployment_id"]))
+        put_event(PackagingSuccessEvent(body["deployment_id"]))
     except:
-        put_event(DeploymentFailedEvent(body["deployment_id"]))
+        put_event(PackagingFailedEvent(body["deployment_id"]))
 
 def handle_packaging_success(body):
     """ Packaging successful, start deployment step"""
@@ -34,9 +34,9 @@ def handle_packaging_success(body):
         deployment = get_db().get(body["deployment_id"])
         deploy(deployment)
 
-        put_event(PackagingSuccessEvent(body["deployment_id"]))
+        put_event(DeploymentSuccessEvent(body["deployment_id"]))
     except:
-        put_event(PackagingFailedEvent(body["deployment_id"]))
+        put_event(DeploymentFailedEvent(body["deployment_id"]))
 
 def handle_packaging_failed(body):
     """ Notify user on slack about packaging failure """
