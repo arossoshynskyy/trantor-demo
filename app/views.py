@@ -1,34 +1,30 @@
 import logging
 
-from tinydb import Query
-
-from app import steps
-from app.events.event_bus import put_event
-from app.events.events import DeploymentCreatedEvent
-from app import event_handler
-from app.db import get_db
+from app.events.router import EventRouter
+from app import service
 
 logger = logging.getLogger(__name__)
 
 
 def get_deployments():
-    return get_db().search(Query().document_id.exists())
+    return service.get_deployments()
 
 def get_deployment(deployment_id):
-    return get_db().get(deployment_id)
+    return service.get_deployment(deployment_id)
 
 def create_deployment(body):
-    """ save deploymen to db, create DeploymentCreatedEvent """
-
-    deployment_id = get_db().insert(body)
-    logger.debug(f"Created new deployment {deployment_id}")
-
-    put_event(DeploymentCreatedEvent(deployment_id))
-    
-    return get_db().get(deployment_id)
+    return service.create_deployment(body)
 
 def delete_deployment(deployment_id):
-    get_db().remove(deployment_id)
+    service.delete_deployment(deployment_id)
+
+
+router = EventRouter()
+router.register_handler("DeploymentCreatedEvent", service.handle_deployment_created)
+router.register_handler("PackagingSuccessEvent", service.handle_packaging_success)
+router.register_handler("PackagingFailedEvent", service.handle_packaging_failed)
+router.register_handler("DeploymentFailedvent", service.handle_deployment_failed)
+router.register_handler("DeploymentSuccessEvent", service.handle_deployment_success)
 
 def handle_event(body):
-    event_handler.handle_event(body)
+    router.handle(body)
