@@ -1,6 +1,6 @@
 import logging
 
-from app.events.router import EventRouter
+from app.events import router
 from app import service
 
 logger = logging.getLogger(__name__)
@@ -19,12 +19,25 @@ def delete_deployment(deployment_id):
     service.delete_deployment(deployment_id)
 
 
-router = EventRouter()
-router.register_handler("DeploymentCreatedEvent", service.handle_deployment_created)
-router.register_handler("PackagingSuccessEvent", service.handle_packaging_success)
-router.register_handler("PackagingFailedEvent", service.handle_packaging_failed)
-router.register_handler("DeploymentFailedvent", service.handle_deployment_failed)
-router.register_handler("DeploymentSuccessEvent", service.handle_deployment_success)
-
 def handle_event(body):
     router.handle(body)
+
+@router.event_handler("DeploymentCreatedEvent")
+def handle_deployment_created(body):
+    service.handle_deployment_created(body)
+
+@router.event_handler("PackagingSuccessEvent")
+def handle_packaging_success(body):
+    service.handle_packaging_success(body)
+
+@router.event_handler("PackagingFailedEvent")
+def handle_packaging_failed(body):
+    service.handle_packaging_failed(body)
+
+@router.event_handler("DeploymentFailedEvent")
+def handle_deployment_failed(body):
+    service.handle_deployment_failed(body)
+
+@router.event_handler("DeploymentSuccessEvent")
+def handle_deployment_success(body):
+    service.handle_deployment_success(body)

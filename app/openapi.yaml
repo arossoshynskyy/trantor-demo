@@ -125,8 +125,6 @@ components:
           format: date-time
           example: 2016-05-12T12:59:23Z
           readOnly: true
-      discriminator:
-        propertyName: event_type
 
     DeploymentCreatedEvent:
       allOf:
